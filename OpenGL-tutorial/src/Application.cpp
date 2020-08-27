@@ -29,18 +29,27 @@ int main(void)
 
 	std::cout << glGetString(GL_VERSION) << '\n';
 
+	float Positions[6] = {
+		-0.5f, -0.5f,
+		 0.0f,  0.5f,
+		 0.5f, -0.5f,
+	};
+
+
+	// openGL works like a state machine.
+	unsigned int Buffer;
+	glGenBuffers(1, &Buffer);	// Create a buffer and returns the buffer id
+	glBindBuffer(GL_ARRAY_BUFFER, Buffer);	// Select a buffer
+	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Positions, GL_STATIC_DRAW);	// Put data in the buffer
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBegin(GL_TRIANGLES);
-		glVertex2f(-0.5f, -0.5f);
-		glVertex2f( 0.0f,  0.5f);
-		glVertex2f( 0.5f, -0.5f);
-		glEnd();
-
+		glDrawArrays(GL_TRIANGLES, 0, 3);	// Draw the bound buffer
+		
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
