@@ -3,6 +3,49 @@
 
 #include <iostream>
 
+static unsigned int CompileShader(unsigned int type, const std::string& source)
+{
+	unsigned int id = glCreateShader(type);
+	const char* src = source.c_str();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
+
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int length;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+		char* message = (char *)alloca(length * sizeof(char));
+		glGetShaderInfoLog(id, length, &length, message);
+		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") <<" shader\n";
+		std::cout << message << '\n';
+		glDeleteShader(id);
+		return 0;
+	}
+
+	return id;
+}
+
+static unsigned int CreateShader(const std::string& VertexShader, const std::string& FragmentShader)
+{
+	unsigned int Program = glCreateProgram();
+	unsigned int vs = CompileShader(GL_VERTEX_SHADER, VertexShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, FragmentShader);
+
+	glAttachShader(Program, vs);
+	glAttachShader(Program, fs);
+	glLinkProgram(Program);
+	glValidateProgram(Program);
+
+	// We got a program so we can delete our shader source code.
+	// The shader source is necessary for debugging.
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return Program;
+}
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -44,6 +87,29 @@ int main(void)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
+	std::string VertexShader =
+		"#version 330 core\n"
+		"\n"
+		"layout(location = 0) in vec4 position;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = position;\n"
+		"}\n";
+
+	std::string FragmentShader =
+		"#version 330 core\n"
+		"\n"
+		"layout(location = 0) out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	color = vec4(1.0, 0.0, 0.0, 1.0);\n"
+		"}\n";
+
+	unsigned int Shader = CreateShader(VertexShader, FragmentShader);
+	glUseProgram(Shader);
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -58,6 +124,8 @@ int main(void)
 		/* Poll for and process events */
 		glfwPollEvents();
 	}
+
+	glDeleteProgram(Shader);
 
 	glfwTerminate();
 	return 0;
