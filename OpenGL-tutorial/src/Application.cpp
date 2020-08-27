@@ -29,18 +29,20 @@ int main(void)
 
 	std::cout << glGetString(GL_VERSION) << '\n';
 
-	float Positions[6] = {
-		-0.5f, -0.5f,
+	float Positions[6] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
+		-0.5f, -0.5f,  // x and y positions of the vertex
 		 0.0f,  0.5f,
 		 0.5f, -0.5f,
 	};
-
 
 	// openGL works like a state machine.
 	unsigned int Buffer;
 	glGenBuffers(1, &Buffer);	// Create a buffer and returns the buffer id
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer);	// Select a buffer
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Positions, GL_STATIC_DRAW);	// Put data in the buffer
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -48,7 +50,7 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);	// Draw the bound buffer
+		glDrawArrays(GL_TRIANGLES, 0, 3);	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
 		
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
