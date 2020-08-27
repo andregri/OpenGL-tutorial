@@ -62,3 +62,17 @@ int main(void)
 	glfwTerminate();
 	return 0;
 }
+
+/*
+06 - A shader is a program that runs in the GPU. We can write the shader as a string and pass it to the GPU
+that compile and runs it. You have to tell the GPU what to do with the provided data (shape, color, ...).
+There are 2 main shader types: vertex shaders and fragment shaders.
+Rendering pipeline: from data to result on the screen.
+When we call the Draw call first the vertex shader is called and then the fragment shader is called and we see
+the result on the screen. The vertex shader is called for every vertex (in a triangle is called 3 times). Its
+main purpose is to draw the vertex in a specific position. The fragment shader / pixel shader run once for each
+pixel that has to be rasterized on the screen (the rasterization process fills the pixel in the triangle, put the
+color). So vertex shader is called 3 times, the fragment shader can be called thousands, millions of times.
+The color depends on the lighting, the texture, etc... the fragment shader determines the color of the pixels.
+Shaders can be very complex and can be generated at run time for complex applications.
+*/
