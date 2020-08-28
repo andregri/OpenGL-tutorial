@@ -6,6 +6,31 @@
 #include <string>
 #include <sstream>
 
+#define ASSERT(x) if(!(x))  __debugbreak()
+#ifdef _DEBUG
+	#define GLCall(x) GLClearError();\
+		x;\
+		ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#else
+	#define GLCall(x) x
+#endif
+
+static void GLClearError()
+{
+	while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+	while (GLenum error = glGetError())
+	{
+		std::cout << "[OpenGL Error] (" << error << "): "
+			<< file << ": " << function << ": " << line << '\n';
+		return false;
+	}
+	return true;
+}
+
 struct ShaderProgramSource
 {
 	std::string VertexSource;
@@ -132,25 +157,25 @@ int main(void)
 	// openGL works like a state machine.
 	// Vertex buffer
 	unsigned int Buffer;
-	glGenBuffers(1, &Buffer);	// Create a buffer and returns the buffer id
-	glBindBuffer(GL_ARRAY_BUFFER, Buffer);	// Select a buffer
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), Positions, GL_STATIC_DRAW);	// Put data in the buffer
+	GLCall(glGenBuffers(1, &Buffer));	// Create a buffer and returns the buffer id
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, Buffer));	// Select a buffer
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), Positions, GL_STATIC_DRAW));	// Put data in the buffer
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);  // define the data format of the vertex
+	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));  // define the data format of the vertex
 
 	// Index buffer
 	unsigned int ibo;
-	glGenBuffers(1, &ibo);	// Create a buffer and returns the buffer id
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// Select a buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);	// Put data in the buffer
+	GLCall(glGenBuffers(1, &ibo));	// Create a buffer and returns the buffer id
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));	// Select a buffer
+	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));	// Put data in the buffer
 
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 	std::cout << "VERTEX\n" << source.VertexSource << '\n';
 	std::cout << "FRAGMENT\n" << source.FragmentSource << '\n';
 
 	unsigned int Shader = CreateShader(source.VertexSource, source.FragmentSource);
-	glUseProgram(Shader);
+	GLCall(glUseProgram(Shader));
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -158,8 +183,9 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
-		
+		//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));	// This will raise an error.
+		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
+
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
