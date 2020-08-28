@@ -117,20 +117,33 @@ int main(void)
 
 	std::cout << glGetString(GL_VERSION) << '\n';
 
-	float Positions[6] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
+	float Positions[] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
 		-0.5f, -0.5f,  // x and y positions of the vertex
-		 0.0f,  0.5f,
 		 0.5f, -0.5f,
+		 0.5f,  0.5f,
+		-0.5f,  0.5f,
+	};
+
+	unsigned int indices[] = {  // You must use an unsigned type
+		0, 1, 2,  // indices for the right triangle
+		2, 3, 0,  // indices for the left triangle
 	};
 
 	// openGL works like a state machine.
+	// Vertex buffer
 	unsigned int Buffer;
 	glGenBuffers(1, &Buffer);	// Create a buffer and returns the buffer id
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer);	// Select a buffer
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), Positions, GL_STATIC_DRAW);	// Put data in the buffer
-	
+	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), Positions, GL_STATIC_DRAW);	// Put data in the buffer
+
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);  // define the data format of the vertex
+
+	// Index buffer
+	unsigned int ibo;
+	glGenBuffers(1, &ibo);	// Create a buffer and returns the buffer id
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// Select a buffer
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);	// Put data in the buffer
 
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 	std::cout << "VERTEX\n" << source.VertexSource << '\n';
@@ -145,7 +158,7 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
 		
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
