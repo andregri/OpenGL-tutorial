@@ -124,6 +124,10 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // I want core profile instead of compatibility profile.
+
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 	if (!window)
@@ -156,15 +160,20 @@ int main(void)
 		2, 3, 0,  // indices for the left triangle
 	};
 
+	// Create a vertex array object
+	unsigned int vao;
+	GLCall(glGenVertexArrays(1, &vao));
+	GLCall(glBindVertexArray(vao));
+
 	// openGL works like a state machine.
 	// Vertex buffer
 	unsigned int Buffer;
 	GLCall(glGenBuffers(1, &Buffer));	// Create a buffer and returns the buffer id
-	GLCall(glBindBuffer(GL_ARRAY_BUFFER, Buffer));	// Select a buffer
-	GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), Positions, GL_STATIC_DRAW));	// Put data in the buffer
-
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, Buffer));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), Positions, GL_STATIC_DRAW));	// Put data in the buffer
+	
 	GLCall(glEnableVertexAttribArray(0));
-	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));  // define the data format of the vertex
+	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
 
 	// Index buffer
 	unsigned int ibo;
@@ -183,6 +192,13 @@ int main(void)
 	ASSERT(location != -1);
 	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
 
+	// Unbound
+	GLCall(glBindVertexArray(0));
+	GLCall(glUseProgram(0));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+
+
 	float r = 0.0f;
 	float increment = 0.05f;
 
@@ -192,8 +208,12 @@ int main(void)
 		/* Render here */
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+		GLCall(glUseProgram(Shader));
 		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
 
+		GLCall(glBindVertexArray(vao));
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+		
 		//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));	// This will raise an error.
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
 
