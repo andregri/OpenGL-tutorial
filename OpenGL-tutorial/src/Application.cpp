@@ -135,6 +135,8 @@ int main(void)
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
+	glfwSwapInterval(1);  // for synchronization
+
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Error!\n";
@@ -177,14 +179,33 @@ int main(void)
 	unsigned int Shader = CreateShader(source.VertexSource, source.FragmentSource);
 	GLCall(glUseProgram(Shader));
 
+	GLCall(int location = glGetUniformLocation(Shader, "u_Color"));
+	ASSERT(location != -1);
+	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
+
+	float r = 0.0f;
+	float increment = 0.05f;
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
-		glClear(GL_COLOR_BUFFER_BIT);
+		GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
 
 		//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));	// This will raise an error.
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
+
+		if (r > 1.0f)
+		{
+			increment = -0.05f;
+		}
+		else if(r < 0.0f)
+		{
+			increment = 0.05f;
+		}
+		r += increment;
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -193,7 +214,7 @@ int main(void)
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(Shader);
+	GLCall(glDeleteProgram(Shader));
 
 	glfwTerminate();
 	return 0;
