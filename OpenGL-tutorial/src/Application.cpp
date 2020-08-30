@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 struct ShaderProgramSource
 {
@@ -139,25 +140,17 @@ int main(void)
 			2, 3, 0,  // indices for the left triangle
 		};
 
-		// Create a vertex array object
-		unsigned int vao;
-		GLCall(glGenVertexArrays(1, &vao));
-		GLCall(glBindVertexArray(vao));
-
-		// openGL works like a state machine.
-		// Vertex buffer
+		VertexArray va;
 		VertexBuffer vb(Positions, 4 * 2 * sizeof(float));
 
-		GLCall(glEnableVertexAttribArray(0));
-		GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+		VertexBufferLayout layout;
+		layout.Push<float>(2);
+		va.AddBuffer(vb, layout);
 
 		// Index buffer
 		IndexBuffer ib(indices, 6);
 
 		ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
-		std::cout << "VERTEX\n" << source.VertexSource << '\n';
-		std::cout << "FRAGMENT\n" << source.FragmentSource << '\n';
-
 		unsigned int Shader = CreateShader(source.VertexSource, source.FragmentSource);
 		GLCall(glUseProgram(Shader));
 
@@ -166,7 +159,7 @@ int main(void)
 		GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));
 
 		// Unbound
-		GLCall(glBindVertexArray(0));
+		va.Unbind();
 		GLCall(glUseProgram(0));
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
@@ -184,7 +177,7 @@ int main(void)
 			GLCall(glUseProgram(Shader));
 			GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
 
-			GLCall(glBindVertexArray(vao));
+			va.Bind();
 			ib.Bind();
 
 			//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));	// This will raise an error.
