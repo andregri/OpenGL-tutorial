@@ -8,6 +8,7 @@
 
 #include "Renderer.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -77,6 +78,8 @@ int main(void)
 		vb.Unbind();
 		ib.Unbind();
 
+		Renderer renderer;
+
 
 		float r = 0.0f;
 		float increment = 0.05f;
@@ -85,14 +88,12 @@ int main(void)
 		while (!glfwWindowShouldClose(window))
 		{
 			/* Render here */
+			renderer.Clear();
+
 			shader.Bind();
 			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
-			va.Bind();
-			ib.Bind();
-
-			//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));	// This will raise an error.
-			GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));	// Draw the bound buffer: when the shader receives the vertex buffer, it has to know the layout of that buffer.
+			renderer.Draw(va, ib, shader);
 
 			if (r > 1.0f)
 			{
