@@ -12,6 +12,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 int main(void)
 {
@@ -46,10 +47,10 @@ int main(void)
 	std::cout << glGetString(GL_VERSION) << '\n';
 	{
 		float Positions[] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
-			-0.5f, -0.5f,  // x and y positions of the vertex
-			 0.5f, -0.5f,
-			 0.5f,  0.5f,
-			-0.5f,  0.5f,
+			-0.5f, -0.5f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
+			 0.5f, -0.5f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 1.0f
 		};
 
 		unsigned int indices[] = {  // You must use an unsigned type
@@ -57,10 +58,14 @@ int main(void)
 			2, 3, 0,  // indices for the left triangle
 		};
 
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 		VertexArray va;
-		VertexBuffer vb(Positions, 4 * 2 * sizeof(float));
+		VertexBuffer vb(Positions, 4 * 4 * sizeof(float));
 
 		VertexBufferLayout layout;
+		layout.Push<float>(2);
 		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
@@ -69,14 +74,17 @@ int main(void)
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
-
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+		Texture texture("res/textures/image.png");
+		texture.Bind();
+		shader.SetUniform1i("u_Texture", 0);
 
 		// Unbound
 		va.Unbind();
-		shader.Unbind();
 		vb.Unbind();
 		ib.Unbind();
+		shader.Unbind();
 
 		Renderer renderer;
 
