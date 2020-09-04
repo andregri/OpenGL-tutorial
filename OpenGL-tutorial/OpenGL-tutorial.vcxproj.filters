@@ -70,10 +70,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textures\wood.png">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="res\textures\image.png">
+    <Image Include="res\textures\logo.png">
       <Filter>File di risorse</Filter>
     </Image>
   </ItemGroup>
