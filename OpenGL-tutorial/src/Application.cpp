@@ -50,10 +50,10 @@ int main(void)
 	std::cout << glGetString(GL_VERSION) << '\n';
 	{
 		float Positions[] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
-			-0.5f, -0.5f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
-			 0.5f, -0.5f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 1.0f
+			100.0f, 100.0f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
+			200.0f, 100.0f, 1.0f, 0.0f,
+			200.0f, 200.0f, 1.0f, 1.0f,
+			100.0f, 200.0f, 0.0f, 1.0f
 		};
 
 		unsigned int indices[] = {  // You must use an unsigned type
@@ -75,7 +75,11 @@ int main(void)
 		// Index buffer
 		IndexBuffer ib(indices, 6);
 		
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2
+		// The projection matrix converts vertices to the normalized coordinate system.
+		glm::mat4 proj = glm::ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
+		
+		glm::vec4 vp(100.0f, 100.0f, 0.0f, 1.0f);
+		glm::vec4 result = proj * vp;
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
