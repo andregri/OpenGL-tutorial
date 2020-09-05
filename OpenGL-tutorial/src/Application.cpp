@@ -30,7 +30,7 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // I want core profile instead of compatibility profile.
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -76,15 +76,16 @@ int main(void)
 		IndexBuffer ib(indices, 6);
 		
 		// The projection matrix converts vertices to the normalized coordinate system.
-		glm::mat4 proj = glm::ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
+		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0));  // camera matrix
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 200, 0));
 		
-		glm::vec4 vp(100.0f, 100.0f, 0.0f, 1.0f);
-		glm::vec4 result = proj * vp;
+		glm::mat4 mvp = proj * view * model;  // the order is important!
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-		shader.SetUniformMat4f("u_MVP", proj);
+		shader.SetUniformMat4f("u_MVP", mvp);
 
 		Texture texture("res/textures/logo.png");
 		texture.Bind();
