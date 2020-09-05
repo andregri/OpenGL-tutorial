@@ -17,6 +17,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -77,15 +81,11 @@ int main(void)
 		
 		// The projection matrix converts vertices to the normalized coordinate system.
 		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(100, 0, 0));  // camera matrix
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 200, 0));
-		
-		glm::mat4 mvp = proj * view * model;  // the order is important!
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));  // camera matrix
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-		shader.SetUniformMat4f("u_MVP", mvp);
 
 		Texture texture("res/textures/logo.png");
 		texture.Bind();
@@ -99,6 +99,21 @@ int main(void)
 
 		Renderer renderer;
 
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+
+		glm::vec3 translation(200, 200, 0);
+
+		// Setup Platform/Renderer bindings
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		// GL 3.2 + GLSL 150
+		const char* glsl_version = "#version 150";
+		ImGui_ImplOpenGL3_Init(glsl_version);
 
 		float r = 0.0f;
 		float increment = 0.05f;
@@ -109,8 +124,17 @@ int main(void)
 			/* Render here */
 			renderer.Clear();
 
+			// Start the Dear ImGui frame
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 mvp = proj * view * model;  // the order is important!
+
 			shader.Bind();
 			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+			shader.SetUniformMat4f("u_MVP", mvp);
 
 			renderer.Draw(va, ib, shader);
 
@@ -124,6 +148,16 @@ int main(void)
 			}
 			r += increment;
 
+			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+			{
+				ImGui::SliderFloat3("Translate", &translation.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
+
+			// Rendering
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 			/* Swap front and back buffers */
 			glfwSwapBuffers(window);
 
@@ -131,6 +165,10 @@ int main(void)
 			glfwPollEvents();
 		}
 	}
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
 	glfwTerminate();
 	return 0;
 }
