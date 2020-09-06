@@ -21,6 +21,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "tests/TestClearColor.h"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -52,50 +54,10 @@ int main(void)
 	}
 
 	std::cout << glGetString(GL_VERSION) << '\n';
+
 	{
-		float Positions[] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
-			-50.0f, -50.0f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
-			 50.0f, -50.0f, 1.0f, 0.0f,
-			 50.0f,  50.0f, 1.0f, 1.0f,
-			-50.0f,  50.0f, 0.0f, 1.0f
-		};
-
-		unsigned int indices[] = {  // You must use an unsigned type
-			0, 1, 2,  // indices for the right triangle
-			2, 3, 0,  // indices for the left triangle
-		};
-
 		GLCall(glEnable(GL_BLEND));
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-		VertexArray va;
-		VertexBuffer vb(Positions, 4 * 4 * sizeof(float));
-
-		VertexBufferLayout layout;
-		layout.Push<float>(2);
-		layout.Push<float>(2);
-		va.AddBuffer(vb, layout);
-
-		// Index buffer
-		IndexBuffer ib(indices, 6);
-		
-		// The projection matrix converts vertices to the normalized coordinate system.
-		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));  // camera matrix - NOTE: this view matrix doesn't translate now but we'll use it in the future.
-
-		Shader shader("res/shaders/Basic.shader");
-		shader.Bind();
-		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-
-		Texture texture("res/textures/logo.png");
-		texture.Bind();
-		shader.SetUniform1i("u_Texture", 0);
-
-		// Unbound
-		va.Unbind();
-		vb.Unbind();
-		ib.Unbind();
-		shader.Unbind();
 
 		Renderer renderer;
 
@@ -106,18 +68,13 @@ int main(void)
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
-
-		glm::vec3 translationA(200, 200, 0);
-		glm::vec3 translationB(400, 200, 0);
-
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		// GL 3.2 + GLSL 150
 		const char* glsl_version = "#version 150";
 		ImGui_ImplOpenGL3_Init(glsl_version);
 
-		float r = 0.0f;
-		float increment = 0.05f;
+		test::TestClearColor test;
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
@@ -125,47 +82,15 @@ int main(void)
 			/* Render here */
 			renderer.Clear();
 
+			test.OnUpdate(0.0f);
+			test.OnRender();
+
 			// Start the Dear ImGui frame
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			
-
-			{
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-				glm::mat4 mvp = proj * view * model;  // the order is important!
-				shader.Bind();
-				shader.SetUniformMat4f("u_MVP", mvp);
-
-				renderer.Draw(va, ib, shader);
-			}
-			
-			{
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
-				glm::mat4 mvp = proj * view * model;  // the order is important!
-				shader.Bind();
-				shader.SetUniformMat4f("u_MVP", mvp);
-
-				renderer.Draw(va, ib, shader);
-			}
-
-			if (r > 1.0f)
-			{
-				increment = -0.05f;
-			}
-			else if (r < 0.0f)
-			{
-				increment = 0.05f;
-			}
-			r += increment;
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-			{
-				ImGui::SliderFloat3("Translate A", &translationA.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				ImGui::SliderFloat3("Translate B", &translationB.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			}
+			test.OnImGuiRender();
 
 			// Rendering
 			ImGui::Render();
