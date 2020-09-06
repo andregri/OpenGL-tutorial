@@ -54,10 +54,10 @@ int main(void)
 	std::cout << glGetString(GL_VERSION) << '\n';
 	{
 		float Positions[] = {  // Each line is a vertex-position (a vertex is more than a position, it can contains more than positions)
-			100.0f, 100.0f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
-			200.0f, 100.0f, 1.0f, 0.0f,
-			200.0f, 200.0f, 1.0f, 1.0f,
-			100.0f, 200.0f, 0.0f, 1.0f
+			-50.0f, -50.0f, 0.0f, 0.0f,  // x and y positions of the vertex + bottom left corner of the texture
+			 50.0f, -50.0f, 1.0f, 0.0f,
+			 50.0f,  50.0f, 1.0f, 1.0f,
+			-50.0f,  50.0f, 0.0f, 1.0f
 		};
 
 		unsigned int indices[] = {  // You must use an unsigned type
@@ -81,7 +81,7 @@ int main(void)
 		
 		// The projection matrix converts vertices to the normalized coordinate system.
 		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);  // 4:3 aspect ratio if you multiply by 2. Any vertex that is out of these bounds is not displayed.
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));  // camera matrix
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));  // camera matrix - NOTE: this view matrix doesn't translate now but we'll use it in the future.
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
@@ -107,7 +107,8 @@ int main(void)
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 
-		glm::vec3 translation(200, 200, 0);
+		glm::vec3 translationA(200, 200, 0);
+		glm::vec3 translationB(400, 200, 0);
 
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -129,14 +130,25 @@ int main(void)
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
-			glm::mat4 mvp = proj * view * model;  // the order is important!
+			
 
-			shader.Bind();
-			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
-			shader.SetUniformMat4f("u_MVP", mvp);
+			{
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+				glm::mat4 mvp = proj * view * model;  // the order is important!
+				shader.Bind();
+				shader.SetUniformMat4f("u_MVP", mvp);
 
-			renderer.Draw(va, ib, shader);
+				renderer.Draw(va, ib, shader);
+			}
+			
+			{
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
+				glm::mat4 mvp = proj * view * model;  // the order is important!
+				shader.Bind();
+				shader.SetUniformMat4f("u_MVP", mvp);
+
+				renderer.Draw(va, ib, shader);
+			}
 
 			if (r > 1.0f)
 			{
@@ -150,7 +162,8 @@ int main(void)
 
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 			{
-				ImGui::SliderFloat3("Translate", &translation.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::SliderFloat3("Translate A", &translationA.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::SliderFloat3("Translate B", &translationB.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			}
 
