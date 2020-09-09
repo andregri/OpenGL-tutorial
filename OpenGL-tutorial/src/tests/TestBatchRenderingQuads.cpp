@@ -43,7 +43,7 @@ namespace test {
 
 		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 12);
 
-		m_Shader = std::make_unique<Shader>("res/shaders/Basic.shader");
+		m_Shader = std::make_unique<Shader>("res/shaders/BatchRendering.shader");
 		m_Shader->Bind();
 		m_Shader->SetUniform4f("u_Color", m_QuadsColor[0], m_QuadsColor[1], m_QuadsColor[2], m_QuadsColor[3]);
 	}

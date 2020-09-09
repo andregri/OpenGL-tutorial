@@ -148,6 +148,8 @@
   <ItemGroup>
     <None Include="imgui.ini" />
     <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\BatchRendering.shader" />
+    <None Include="res\shaders\Texture.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\IndexBuffer.h" />

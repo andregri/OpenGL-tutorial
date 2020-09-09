@@ -76,6 +76,8 @@
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
     <None Include="imgui.ini" />
+    <None Include="res\shaders\Texture.shader" />
+    <None Include="res\shaders\BatchRendering.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
