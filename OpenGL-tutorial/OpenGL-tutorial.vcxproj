@@ -143,6 +143,7 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\tests\TestBatchRenderingQuads.cpp" />
+    <ClCompile Include="src\tests\TestBatchRenderingColors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
@@ -169,6 +170,7 @@
     <ClInclude Include="src\VertexBufferLayout.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\tests\TestBatchRenderingQuads.h" />
+    <ClInclude Include="src\tests\TestBatchRenderingColors.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\logo.png" />
