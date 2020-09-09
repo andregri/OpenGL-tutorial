@@ -145,6 +145,7 @@
     <ClCompile Include="src\tests\TestBatchRenderingQuads.cpp" />
     <ClCompile Include="src\tests\TestBatchRenderingColors.cpp" />
     <ClCompile Include="src\tests\TestBatchRenderingTexture2D.cpp" />
+    <ClCompile Include="src\tests\TestDynamicBatchRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\tests\TestBatchRenderingQuads.h" />
     <ClInclude Include="src\tests\TestBatchRenderingColors.h" />
     <ClInclude Include="src\tests\TestBatchRenderingTexture2D.h" />
+    <ClInclude Include="src\tests\TestDynamicBatchRendering.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\fire.png" />

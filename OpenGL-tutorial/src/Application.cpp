@@ -21,6 +21,7 @@
 #include "tests/TestBatchRenderingQuads.h"
 #include "tests/TestBatchRenderingColors.h"
 #include "tests/TestBatchRenderingTexture2D.h"
+#include "tests/TestDynamicBatchRendering.h"
 
 int main(void)
 {
@@ -82,6 +83,7 @@ int main(void)
 		testMenu->RegisterTest<test::TestBatchRenderingQuads>("Batch Rendering of quads");
 		testMenu->RegisterTest<test::TestBatchRenderingColors>("Batch Rendering Colors");
 		testMenu->RegisterTest<test::TestBatchRenderingTexture2D>("Batch Rendering 2D Texture");
+		testMenu->RegisterTest<test::TestDynamicBatchRendering>("Dynamic Batching");
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
