@@ -7,12 +7,6 @@
 #include <sstream>
 
 #include "Renderer.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -26,6 +20,7 @@
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatchRenderingQuads.h"
 #include "tests/TestBatchRenderingColors.h"
+#include "tests/TestBatchRenderingTexture2D.h"
 
 int main(void)
 {
@@ -86,6 +81,7 @@ int main(void)
 		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
 		testMenu->RegisterTest<test::TestBatchRenderingQuads>("Batch Rendering of quads");
 		testMenu->RegisterTest<test::TestBatchRenderingColors>("Batch Rendering Colors");
+		testMenu->RegisterTest<test::TestBatchRenderingTexture2D>("Batch Rendering 2D Texture");
 
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))

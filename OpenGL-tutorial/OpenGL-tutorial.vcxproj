@@ -144,6 +144,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\tests\TestBatchRenderingQuads.cpp" />
     <ClCompile Include="src\tests\TestBatchRenderingColors.cpp" />
+    <ClCompile Include="src\tests\TestBatchRenderingTexture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
@@ -173,8 +174,10 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\tests\TestBatchRenderingQuads.h" />
     <ClInclude Include="src\tests\TestBatchRenderingColors.h" />
+    <ClInclude Include="src\tests\TestBatchRenderingTexture2D.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\textures\fire.png" />
     <Image Include="res\textures\logo.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
